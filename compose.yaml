@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-revive}
+      POSTGRES_USER: ${POSTGRES_USER:-revive}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-revive}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    image: flyway/flyway:11-alpine
+    profiles: ["migration"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: migrate
+    environment:
+      FLYWAY_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-revive}
+      FLYWAY_USER: ${POSTGRES_USER:-revive}
+      FLYWAY_PASSWORD: ${POSTGRES_PASSWORD:-revive}
+    volumes:
+      - ./database/migrations:/flyway/sql:ro
+
+volumes:
+  postgres_data:
