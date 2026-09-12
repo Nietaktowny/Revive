@@ -1,5 +1,23 @@
 services:
-  postgres:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/frontend.Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend.Dockerfile
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  database:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
@@ -20,11 +38,11 @@ services:
     image: flyway/flyway:11-alpine
     profiles: ["migration"]
     depends_on:
-      postgres:
+      database:
         condition: service_healthy
     command: migrate
     environment:
-      FLYWAY_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-revive}
+      FLYWAY_URL: jdbc:postgresql://database:5432/${POSTGRES_DB:-revive}
       FLYWAY_USER: ${POSTGRES_USER:-revive}
       FLYWAY_PASSWORD: ${POSTGRES_PASSWORD:-revive}
     volumes:
