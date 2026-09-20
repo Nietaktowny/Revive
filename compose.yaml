@@ -3,6 +3,8 @@ services:
     build:
       context: ./frontend
       dockerfile: ../docker/frontend.Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
     ports:
       - "5173:80"
     depends_on:
@@ -19,6 +21,8 @@ services:
       - ./backend/app:/app/app
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-revive}:${POSTGRES_PASSWORD:-revive}@database:5432/${POSTGRES_DB:-revive}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT_SECRET_KEY must be set}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:5173,http://127.0.0.1:5173}
     depends_on:
       database:
         condition: service_healthy
