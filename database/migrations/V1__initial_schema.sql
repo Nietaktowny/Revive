@@ -1,11 +1,11 @@
 CREATE TABLE users (
-    id BIGSERIAL PRIMARY KEY,
-    email TEXT NOT NULL UNIQUE,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    password_hash TEXT NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    username TEXT NOT NULL UNIQUE,
-    first_name TEXT,
-    last_name TEXT
+    username VARCHAR(50) NOT NULL UNIQUE,
+    first_name VARCHAR(30),
+    last_name VARCHAR(50)
 );
