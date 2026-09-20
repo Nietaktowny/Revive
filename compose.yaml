@@ -17,6 +17,11 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/app:/app/app
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-revive}:${POSTGRES_PASSWORD:-revive}@database:5432/${POSTGRES_DB:-revive}
+    depends_on:
+      database:
+        condition: service_healthy
     restart: unless-stopped
 
   database:
